@@ -1,0 +1,32 @@
+{
+  "name": "dat-editor",
+  "version": "0.0.0",
+  "description": "A visual editor for [dat](http://dat-data.com/) data.",
+  "main": "index.js",
+  "dependencies": {
+    "beefy": "~1.0.0",
+    "browserify": "~3.28.1",
+    "browser-request": "~0.3.1",
+    "xtend": "~2.1.2",
+    "dsv": "0.0.3"
+  },
+  "devDependencies": {
+    "beefy": "~1.0.0",
+    "browserify": "~3.28.1",
+    "brfs": "~0.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "beefy index.js 3000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mapbox/dat-editor.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mapbox/dat-editor/issues"
+  },
+  "homepage": "https://github.com/mapbox/dat-editor"
+}
