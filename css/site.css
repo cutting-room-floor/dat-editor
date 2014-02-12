@@ -1,5 +1,10 @@
 body {
-    font:normal 12px/20px sans-serif;
+    font:300 14px/20px 'Source Sans Pro', sans-serif;
+    color:#111;
+}
+
+a {
+    color:#065cbb;
 }
 
 #map {
@@ -12,9 +17,80 @@ body {
 
 .right-sidebar {
     width:300px;
-    background:rgba(255, 255, 255, 0.9);
+    background:#fff;
     position:absolute;
-    right:0;
-    top:0;
-    bottom:0;
+    right:20px;
+    top:20px;
+    bottom:20px;
+}
+
+.pad1 {
+    padding:10px;
+}
+
+.header {
+    background-color:#288edf;
+    color:#fff;
+}
+
+.rel {
+    position:relative;
+}
+
+.stick-right {
+    position:absolute;
+    right:0px;
+    top:0px;
+    padding:10px;
+    font-weight:300;
+}
+
+#flash {
+    opacity:0;
+    transition:opacity 500ms linear;
+}
+
+#flash.show {
+    opacity:1;
+}
+
+.grey {
+    background-color:#efefef;
+}
+
+#features .feature-item {
+    display:block;
+    padding:10px;
+    border-bottom:1px solid #eee;
+}
+
+#features .feature-item a {
+    text-decoration:none;
+}
+
+.versions-link {
+    text-decoration:none;
+    padding-left:10px;
+    font-size:12px;
+    color:#555;
+    position:absolute;
+    right:20px;
+}
+
+.ghost-container {
+    margin:5px 0;
+    background:#efefef;
+    padding:10px;
+    display:none;
+}
+
+.ghost-container.show {
+    display:block;
+}
+
+.ghost-container a {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display:block;
 }
