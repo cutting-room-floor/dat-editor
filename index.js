@@ -43,6 +43,7 @@ function updateMap() {
         ghosts.clearLayers();
         Object.keys(nested).forEach(function(id) {
             var row = nested[id][nested[id].length - 1];
+            if (!row.geojson) return;
             var gj = JSON.parse(row.geojson);
             var toplayer = L.geoJson(gj).eachLayer(function(l) {
                 l._dat = row;
