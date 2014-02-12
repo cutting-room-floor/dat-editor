@@ -28,7 +28,7 @@ map
     .on('draw:created', created);
 
 var database = [];
-var ghosts;
+var ghosts = L.featureGroup().addTo(map);
 
 updateMap();
 
@@ -38,14 +38,17 @@ function updateMap() {
         var featuresDiv = document.getElementById('features');
         featuresDiv.innerHTML = '';
         var nested = nestedDocuments(database);
+        map.addLayer(featureLayer);
         featureLayer.clearLayers();
+        ghosts.clearLayers();
         Object.keys(nested).forEach(function(id) {
-            var row = nested[id].pop();
+            var row = nested[id][nested[id].length - 1];
             var gj = JSON.parse(row.geojson);
             var toplayer = L.geoJson(gj).eachLayer(function(l) {
                 l._dat = row;
                 featureLayer.addLayer(l);
             });
+            var latest_row = row;
             var item = featuresDiv.appendChild(document.createElement('div'));
             item.className = 'feature-item rel';
 
@@ -61,31 +64,62 @@ function updateMap() {
             versionLink.className = 'versions-link';
             versionLink.innerHTML = nested[id].length + ' versions';
             versionLink.onclick = function() {
-                ghostDiv.innerHTML = '';
-                ghostDiv.classList.remove('show');
-                if (ghosts && map.hasLayer(ghosts)) {
-                    map.removeLayer(ghosts);
-                    if (ghosts._id == id) return;
+                map.removeLayer(featureLayer);
+                removeGhosts();
+                ghosts.clearLayers();
+                if (ghosts._id == id) {
+                    ghosts._id = null;
+                    map.addLayer(featureLayer);
+                    return;
                 }
-                ghostDiv.classList.add('show');
-                ghosts = L.geoJson(nested[id].map(function(row) {
+                var ghostDiv = item.appendChild(document.createElement('div'));
+                ghostDiv.className = 'ghost-container';
+                ghosts._id = id;
+                nested[id].map(function(row, i) {
                     var ghostLink = ghostDiv.appendChild(document.createElement('a'));
-                    ghostLink.innerHTML = row._id;
-                    return JSON.parse(row.geojson) }))
-                    .eachLayer(function(l) {
-                        if (l.setOpacity) l.setOpacity(0.6);
-                    })
-                    .addTo(map);
-               ghosts._id = id;
+                    ghostLink.innerHTML = row._rev;
+                    ghostLink.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        ghosts.eachLayer(function(l) {
+                            if (l != ghost) ghosts.removeLayer(l);
+                        });
+                        var revert = confirm('Do you want to revert to this version?');
+                        if (!revert) {
+                            return updateMap();
+                        } else {
+                            request.post({
+                                url: config.host + row._id,
+                                json: xtend({
+                                    geojson: JSON.parse(row.geojson),
+                                }, {
+                                    _id: latest_row._id,
+                                    _rev: latest_row._rev
+                                })
+                            }, function(err, resp, body) {
+                                flash('reverted feature');
+                                updateMap();
+                            });
+                        }
+                    };
+                    var ghost = L.geoJson(JSON.parse(row.geojson))
+                        .eachLayer(function(l) {
+                            if (i !== nested[id].length - 1 && l.setOpacity) l.setOpacity(0.6);
+                        })
+                        .addTo(ghosts);
+                })
             };
-
-            var ghostDiv = item.appendChild(document.createElement('div'));
-            ghostDiv.className = 'ghost-container';
         });
-        var nested = nestedDocuments(database);
         document.getElementById('meta').innerHTML = Object.keys(nested).length + ' features, ' +
-            '<a href="#" id="versions">' + countArrays(values(nested)) + ' versions</a>';
+            countArrays(values(nested)) + ' versions';
     });
+}
+
+function removeGhosts() {
+    var ghostC = document.getElementsByClassName('ghost-container');
+    for (var i = 0; i < ghostC.length; i++) {
+        ghostC[i].parentNode.removeChild(ghostC[i]);
+    }
 }
 
 function countArrays(l) {

@@ -81,11 +81,8 @@ a {
     margin:5px 0;
     background:#efefef;
     padding:10px;
-    display:none;
-}
-
-.ghost-container.show {
-    display:block;
+    font-family:monospace;
+    font-size:10px;
 }
 
 .ghost-container a {
