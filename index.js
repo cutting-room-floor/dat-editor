@@ -11,6 +11,8 @@ var map = L.mapbox.map('map', 'tmcw.h8einhmh', {
     zoomControl: false
 });
 
+var hash = L.hash(map);
+
 var featureLayer = L.featureGroup().addTo(map);
 
 var drawControl = new L.Control.Draw({
