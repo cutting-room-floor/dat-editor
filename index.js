@@ -33,7 +33,7 @@ var ghosts = L.featureGroup().addTo(map);
 updateMap();
 
 function updateMap() {
-    request(config.host + '_csv', function(err, resp, body) {
+    request(config.host + 'api/csv', function(err, resp, body) {
         database = dsv.csv.parse(body);
         var featuresDiv = document.getElementById('features');
         featuresDiv.innerHTML = '';
@@ -68,17 +68,17 @@ function updateMap() {
                 map.removeLayer(featureLayer);
                 removeGhosts();
                 ghosts.clearLayers();
-                if (ghosts._id == id) {
-                    ghosts._id = null;
+                if (ghosts.key == id) {
+                    ghosts.key = null;
                     map.addLayer(featureLayer);
                     return;
                 }
                 var ghostDiv = item.appendChild(document.createElement('div'));
                 ghostDiv.className = 'ghost-container';
-                ghosts._id = id;
+                ghosts.key = id;
                 nested[id].map(function(row, i) {
                     var ghostLink = ghostDiv.appendChild(document.createElement('a'));
-                    ghostLink.innerHTML = row._rev;
+                    ghostLink.innerHTML = row.version;
                     ghostLink.onclick = function(e) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -90,12 +90,12 @@ function updateMap() {
                             return updateMap();
                         } else {
                             request.post({
-                                url: config.host + row._id,
+                                url: config.host + row.key,
                                 json: xtend({
                                     geojson: JSON.parse(row.geojson),
                                 }, {
-                                    _id: latest_row._id,
-                                    _rev: latest_row._rev
+                                    key: latest_row.key,
+                                    version: latest_row.version
                                 })
                             }, function(err, resp, body) {
                                 flash('reverted feature');
@@ -138,8 +138,8 @@ function values(o) {
 function nestedDocuments(database) {
     var docs = {};
     for (var i = 0; i < database.length; i++) {
-        if (!docs[database[i]._id]) docs[database[i]._id] = [];
-        docs[database[i]._id].push(database[i]);
+        if (!docs[database[i].key]) docs[database[i].key] = [];
+        docs[database[i].key].push(database[i]);
     }
     return docs;
 }
@@ -166,12 +166,12 @@ function update(e) {
     e.layers.eachLayer(function(layer) {
         var geojson = layer.toGeoJSON();
         request.post({
-            url: config.host + layer._dat._id,
+            url: config.host + layer._dat.key,
             json: xtend({
                 geojson: geojson,
             }, {
-                _id: layer._dat._id,
-                _rev: layer._dat._rev
+                key: layer._dat.key,
+                version: layer._dat.version
             })
         }, function(err, resp, body) {
             layer._dat = body;
