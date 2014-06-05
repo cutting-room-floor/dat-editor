@@ -1,7 +1,7 @@
 {
   "name": "dat-editor",
   "version": "0.0.0",
-  "description": "A visual editor for [dat](http://dat-data.com/) data.",
+  "description": "A visual editor for [dat](http://dat-data.com/) geojson data.",
   "main": "index.js",
   "dependencies": {
     "beefy": "~1.0.0",
