@@ -33,8 +33,8 @@ var ghosts = L.featureGroup().addTo(map);
 updateMap();
 
 function updateMap() {
-    request(config.host + 'api/csv', function(err, resp, body) {
-        database = dsv.csv.parse(body);
+    request(config.host + 'api/json?limit=-1', function(err, resp, body) {
+        database = JSON.parse(body).rows
         var featuresDiv = document.getElementById('features');
         featuresDiv.innerHTML = '';
         var nested = nestedDocuments(database);
@@ -44,7 +44,7 @@ function updateMap() {
         Object.keys(nested).forEach(function(id) {
             var row = nested[id][nested[id].length - 1];
             if (!row.geojson) return;
-            var gj = JSON.parse(row.geojson);
+            var gj = row.geojson;
             var toplayer = L.geoJson(gj).eachLayer(function(l) {
                 l._dat = row;
                 featureLayer.addLayer(l);
@@ -90,7 +90,7 @@ function updateMap() {
                             return updateMap();
                         } else {
                             request.post({
-                                url: config.host + row.key,
+                                url: config.host + 'api/' + row.key,
                                 json: xtend({
                                     geojson: JSON.parse(row.geojson),
                                 }, {
@@ -166,7 +166,7 @@ function update(e) {
     e.layers.eachLayer(function(layer) {
         var geojson = layer.toGeoJSON();
         request.post({
-            url: config.host + layer._dat.key,
+            url: config.host + 'api/' + layer._dat.key,
             json: xtend({
                 geojson: geojson,
             }, {
@@ -184,7 +184,7 @@ function update(e) {
 function created(e) {
     var geojson = e.layer.toGeoJSON();
     request.post({
-        url: config.host,
+        url: config.host + 'api/',
         json: {
             geojson: geojson
         }
